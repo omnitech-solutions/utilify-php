@@ -4,6 +4,7 @@ namespace Omnitech\Utilify;
 
 use Illuminate\Support\Arr;
 use RuntimeException;
+use Symfony\Component\Yaml\Yaml;
 use TypeError;
 
 class ArrayUtils
@@ -95,5 +96,103 @@ class ArrayUtils
     public static function isBlank(mixed $value): bool
     {
         return ! self::isFilled($value);
+    }
+
+    /**
+     * Filters the attributes based on the given filters.
+     *
+     * Each filter must have a key and a value of either a string, a regular expression, or a callable that returns a boolean.
+     *
+     * @param  array<string, mixed>  $attributes  The array of attributes to be filtered (string keys, mixed values).
+     * @param  array<string, bool|string|callable>  $filters  An array of filters to apply. Filters can be a boolean, string, regex pattern, or a callable.
+     * @return array<string, mixed> The filtered attributes that match the provided filters.
+     *
+     * @example
+     *
+     * ['field_1' => true] // Always includes 'field_1'
+     * ['field_2' => /^[0-9]*$/] // Includes 'field_2' if it contains only numbers
+     * ['field_3' => function ($value) { // Includes 'field_3' if the callback evaluates to true
+     *     return in_array($value, ['allowed_value1', 'allowed_value2'], true);
+     * }]
+     */
+    public static function filterAttributesByConditions(array $attributes, array $filters): array
+    {
+        // Keep only the filters that match existing attributes
+        $filters = Arr::only($filters, array_keys($attributes));
+
+        $filteredAttributes = [];
+        foreach ($filters as $key => $filter) {
+            $value = $attributes[$key];
+
+            // If the filter is a callable function
+            if (is_callable($filter)) {
+                if ($filter($value)) {
+                    $filteredAttributes[$key] = $value;
+                }
+
+                continue;
+            }
+
+            // If the filter is `true` or a regex pattern, check that value is a string before using preg_match
+            if ($filter === true || (is_string($value) && preg_match($filter, $value))) {
+                $filteredAttributes[$key] = $value;
+            }
+        }
+
+        return $filteredAttributes;
+    }
+
+    /**
+     * Rejects items that are blank.
+     *
+     * This method removes blank items from the provided array. An item is considered blank
+     * if it is null, an empty string, an empty array, or any value that the Laravel `filled` helper
+     * considers as "blank."
+     *
+     * @param  array<string, mixed>  $items  The array of items to filter. The keys are strings, and the values can be of mixed types.
+     * @return array<string, mixed> The filtered array with blank items removed.
+     */
+    public static function rejectBlanks(array $items): array
+    {
+        return array_filter($items, 'filled');
+    }
+
+    /**
+     * Converts the given array to a YAML-formatted string.
+     *
+     * If YAML conversion fails, it falls back to returning a JSON-formatted string.
+     * If JSON encoding fails, it returns an empty string.
+     *
+     * @param  array<string, mixed>  $items  The array of items to format. The keys are strings, and the values can be of mixed types.
+     * @return string The formatted YAML or JSON string, or an empty string if encoding fails.
+     */
+    public static function toYamlStr(array $items): string
+    {
+        try {
+            // Attempt to convert the array to YAML format
+            return Yaml::dump($items, 10);
+        } catch (\Exception) {
+            // If YAML conversion fails, fall back to JSON
+            $jsonContent = json_encode($items, JSON_PRETTY_PRINT);
+
+            // Ensure that a string is returned even if json_encode fails
+            return $jsonContent !== false ? $jsonContent : '';
+        }
+    }
+
+    /**
+     * Converts the given array to a JSON-formatted string.
+     *
+     * If JSON encoding fails, it returns an empty string.
+     *
+     * @param  array<string, mixed>  $items  The array of items to format. The keys are strings, and the values can be of mixed types.
+     * @return string The JSON string or an empty string if encoding fails.
+     */
+    public static function toJsonStr(array $items): string
+    {
+        $jsonContent = json_encode($items, JSON_PRETTY_PRINT);
+
+        // Ensure that a string is always returned, even if json_encode fails
+        return $jsonContent !== false ? $jsonContent : '';
     }
 }

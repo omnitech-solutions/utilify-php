@@ -16,10 +16,12 @@
     ],
     "require": {
         "php": "^8.3.0",
-        "illuminate/support": ">=11.25"
+        "illuminate/support": ">=11.25",
+        "symfony/yaml": "^7.1"
     },
     "require-dev": {
         "laravel/pint": "^1.17.3",
+        "mockery/mockery": "^1.6",
         "pestphp/pest": "^3.0.7",
         "pestphp/pest-plugin-type-coverage": "^3.0",
         "phpstan/phpstan": "^1.12.4",
