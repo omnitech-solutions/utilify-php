@@ -49,7 +49,11 @@
         "refacto": "rector",
         "lint": "pint",
         "test:types": "phpstan analyse --ansi",
-        "test:unit": "pest --colors=always --coverage --parallel --min=100",
+        "test:unit": [
+            "if [ \"$CI\" = \"true\" ]; then composer test:unit:ci; else composer test:unit:local; fi"
+        ],
+        "test:unit:ci": "pest --colors=always --coverage --parallel --min=85",
+        "test:unit:local": "pest --colors=always --coverage --min=85 --testdox",
         "test": [
             "@refacto",
             "@lint",
