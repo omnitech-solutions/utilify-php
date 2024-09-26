@@ -54,4 +54,29 @@ class ArrayUtils
 
         return array_intersect_key($array, array_flip($matches));
     }
+
+    /**
+     * Checks if the given value is filled (non-empty) or not equal to `0`.
+     *
+     * This function determines whether the provided value is either a non-numeric
+     * filled value (not empty or null) or a numeric value that is not equal to `0`.
+     *
+     * - If the value is non-numeric, the function checks if it is filled (not empty).
+     * - If the value is numeric, it returns `true` if the value is not exactly zero.
+     *
+     * @param  mixed  $value  The value to check, which can be of any type (string, number, etc.).
+     * @return bool Returns `true` if the value is filled or not equal to `0`, otherwise `false`.
+     */
+    public static function isFilled(mixed $value): bool
+    {
+        // Handle booleans directly
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        $isFilledNonNumeric = ! is_numeric($value) && filled($value);
+        $isZeroNumeric = is_numeric($value) && (float) $value !== 0.0;
+
+        return $isFilledNonNumeric || $isZeroNumeric;
+    }
 }

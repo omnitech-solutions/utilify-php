@@ -46,8 +46,14 @@
         }
     },
     "scripts": {
-        "refacto": "rector",
-        "lint": "pint",
+        "refacto": [
+            "rector",
+            "git diff --name-only --exit-code || git add $(git diff --name-only)"
+        ],
+        "lint": [
+            "pint",
+            "git diff --name-only --exit-code || git add $(git diff --name-only)"
+        ],
         "test:types": "phpstan analyse --ansi",
         "test:unit": [
             "if [ \"$CI\" = \"true\" ]; then composer test:unit:ci; else composer test:unit:local; fi"

@@ -101,3 +101,56 @@ describe('filterByKeyPattern', function (): void {
             ->toThrow(TypeError::class); // Expect a TypeError due to the invalid regex
     });
 });
+
+describe('isFilled', function (): void {
+    it('checks if a value is filled or not equal to zero', function (): void {
+        expect(ArrayUtils::isFilled(' abc  '))->toBeTrue();  // Non-empty string
+        expect(ArrayUtils::isFilled(null))->toBeFalse();     // Null value
+        expect(ArrayUtils::isFilled(0))->toBeFalse();        // Numeric zero
+        expect(ArrayUtils::isFilled('0'))->toBeFalse();      // String zero
+        expect(ArrayUtils::isFilled(1))->toBeTrue();         // Positive number
+        expect(ArrayUtils::isFilled(-1))->toBeTrue();        // Negative number
+    });
+
+    it('returns true for non-empty strings', function (): void {
+        expect(ArrayUtils::isFilled(' abc  '))->toBeTrue(); // Non-empty string with spaces
+        expect(ArrayUtils::isFilled('Hello'))->toBeTrue();   // Regular non-empty string
+    });
+
+    it('returns false for empty strings', function (): void {
+        expect(ArrayUtils::isFilled(''))->toBeFalse();       // Empty string
+        expect(ArrayUtils::isFilled('    '))->toBeFalse();   // String with spaces only
+    });
+
+    it('returns true for positive and negative integers', function (): void {
+        expect(ArrayUtils::isFilled(1))->toBeTrue();         // Positive integer
+        expect(ArrayUtils::isFilled(-1))->toBeTrue();        // Negative integer
+    });
+
+    it('returns false for zero or string zero', function (): void {
+        expect(ArrayUtils::isFilled(0))->toBeFalse();        // Numeric zero
+        expect(ArrayUtils::isFilled('0'))->toBeFalse();      // String zero
+    });
+
+    it('returns true for non-zero floats', function (): void {
+        expect(ArrayUtils::isFilled(0.1))->toBeTrue();       // Positive float
+        expect(ArrayUtils::isFilled(-0.1))->toBeTrue();      // Negative float
+    });
+
+    it('returns false for boolean false and true for boolean true', function (): void {
+        expect(ArrayUtils::isFilled(false))->toBeFalse();    // Boolean false
+        expect(ArrayUtils::isFilled(true))->toBeTrue();      // Boolean true
+    });
+
+    it('returns false for null', function (): void {
+        expect(ArrayUtils::isFilled(null))->toBeFalse();     // Null value
+    });
+
+    it('returns true for non-empty arrays', function (): void {
+        expect(ArrayUtils::isFilled([1, 2, 3]))->toBeTrue(); // Non-empty array
+    });
+
+    it('returns false for empty arrays', function (): void {
+        expect(ArrayUtils::isFilled([]))->toBeFalse();       // Empty array
+    });
+});
