@@ -154,3 +154,18 @@ describe('isFilled', function (): void {
         expect(ArrayUtils::isFilled([]))->toBeFalse();       // Empty array
     });
 });
+
+describe('isBlank', function (): void {
+    it('returns true for blank or zero values', function (): void {
+        expect(ArrayUtils::isBlank('   '))->toBeTrue();   // Blank string with spaces
+        expect(ArrayUtils::isBlank(null))->toBeTrue();    // Null value
+        expect(ArrayUtils::isBlank(0))->toBeTrue();       // Numeric zero
+        expect(ArrayUtils::isBlank('0'))->toBeTrue();     // String zero
+        expect(ArrayUtils::isBlank('0.000000'))->toBeTrue(); // String representing zero with decimals
+    });
+
+    it('returns false for non-blank, non-zero values', function (): void {
+        expect(ArrayUtils::isBlank(1))->toBeFalse();      // Positive number
+        expect(ArrayUtils::isBlank(-1))->toBeFalse();     // Negative number
+    });
+});
