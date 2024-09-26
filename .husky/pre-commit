@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run linting
+composer lint
+
+# Run refactors
+composer refacto
+
+# Run static analysis
+composer test:types
+
+# Run unit tests
+composer test:unit

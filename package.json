@@ -1,0 +1,32 @@
+{
+  "name": "utilify-php",
+  "version": "1.0.0",
+  "description": "A simple utility library",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "test",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnitech-solutions/utilify-php.git"
+  },
+  "keywords": [
+    "php",
+    "utility",
+    "package"
+  ],
+  "author": "Desmond O'Leary",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/omnitech-solutions/utilify-php/issues"
+  },
+  "homepage": "https://github.com/omnitech-solutions/utilify-php#readme",
+  "devDependencies": {
+    "husky": "^9.1.6"
+  }
+}
