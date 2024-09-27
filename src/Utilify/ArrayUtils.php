@@ -173,10 +173,7 @@ class ArrayUtils
             return Yaml::dump($items, 10);
         } catch (\Exception) {
             // If YAML conversion fails, fall back to JSON
-            $jsonContent = json_encode($items, JSON_PRETTY_PRINT);
-
-            // Ensure that a string is returned even if json_encode fails
-            return $jsonContent !== false ? $jsonContent : '';
+            return self::toJsonStr($items);
         }
     }
 

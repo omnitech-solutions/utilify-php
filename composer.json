@@ -31,7 +31,10 @@
     "autoload": {
         "psr-4": {
             "Omnitech\\Utilify\\": "src/Utilify/"
-        }
+        },
+        "files": [
+            "src/register_macros.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
