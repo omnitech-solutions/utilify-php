@@ -2,6 +2,7 @@
 /.phpunit.cache
 /.php-cs-fixer.cache
 /.php-cs-fixer.php
+/.phpdoc
 /phpunit.xml
 /vendor/
 /node_modules

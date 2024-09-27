@@ -1,0 +1,27 @@
+name: Generate PHP Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run phpDocumentor in Docker
+        run: docker run --rm -v $(pwd):/data phpdoc/phpdoc -d src -t docs
+
+      - name: Deploy to GitHub Pages
+        env:
+          GH_TOKEN: ${{ secrets.GH_PUBLIC_ACCESS_TOKEN }}
+        run: |
+          git config --global user.email "desoleary@gmail.com"
+          git config --global user.name "Desmond O'Leary"
+          git add docs
+          git commit -m "Deploy latest documentation"
+          git push https://$GH_TOKEN@github.com/omnitech-solutions/utilify-php.git `git subtree split --prefix docs main`:refs/heads/gh-pages --force

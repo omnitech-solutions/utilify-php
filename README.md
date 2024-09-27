@@ -1,5 +1,9 @@
 # Utilify
 
+## Documentation
+
+The latest version of the documentation is available [here](https://omnitech-solutions.github.io/utilify-php/namespaces/omnitech-utilify.html).
+
 ### Prerequisites
 
 ```
