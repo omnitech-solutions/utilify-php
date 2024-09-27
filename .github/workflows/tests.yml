@@ -4,42 +4,56 @@ on: ['push', 'pull_request']
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        php: ['8.3']
+        os: [ubuntu, windows]
+        php: ['8.3', '8.4']
         dependency-version: [prefer-lowest, prefer-stable]
+        include:
+          - php: 8.3
+            os: ubuntu
+            setup: stable
+            phpunit: 11
+            coverage: true  # Enable coverage for this job
 
-    name: Tests P${{ matrix.php }} - ${{ matrix.os }} - ${{ matrix.dependency-version }}
+    name: Tests ${{ matrix.phpunit && 'PHPUnit ' + matrix.phpunit + ' - ' || '' }}${{ matrix.classmap-authoritative && 'classmap-authoritative - ' || '' }}${{ matrix.coverage && 'Coverage - ' || '' }}PHP ${{ matrix.php }} - ${{ matrix.setup || 'stable' }} - ${{ matrix.os }}
 
     steps:
 
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php }}
-        extensions: dom, mbstring, zip
-        coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, zip
+          coverage: ${{ matrix.coverage == 'true' && 'pcov' || 'none' }}
 
-    - name: Get Composer cache directory
-      id: composer-cache
-      shell: bash
-      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Verify PCOV Installation
+        run: php -m | grep pcov || echo "PCOV not installed"
+        if: matrix.coverage == 'true'
 
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: dependencies-php-${{ matrix.php }}-os-${{ matrix.os }}-version-${{ matrix.dependency-version }}-composer-${{ hashFiles('composer.json') }}
-        restore-keys: dependencies-php-${{ matrix.php }}-os-${{ matrix.os }}-version-${{ matrix.dependency-version }}-composer-
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_ENV
 
-    - name: Install Composer dependencies
-      run: composer update --${{ matrix.dependency-version }} --no-interaction --prefer-dist
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.dir }}
+          key: dependencies-php-${{ matrix.php }}-os-${{ matrix.os }}-version-${{ matrix.dependency-version }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: dependencies-php-${{ matrix.php }}-os-${{ matrix.os }}-version-${{ matrix.dependency-version }}-composer-
 
-    - name: Integration Tests
-      run: php ./vendor/bin/pest --colors=always --coverage --parallel --min=100
+      - name: Install Composer dependencies
+        run: composer update --${{ matrix.dependency-version }} --no-interaction --prefer-dist
+
+      - name: Integration Tests
+        run: |
+          if [ "${{ matrix.coverage }}" == "true" ]; then
+            php ./vendor/bin/pest --colors=always --coverage --parallel --min=100;
+          else
+            php ./vendor/bin/pest --colors=always --parallel --min=100;
+          fi
